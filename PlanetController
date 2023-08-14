@@ -1,0 +1,177 @@
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+public class PlanetController : MonoBehaviour
+{
+    public static float cushion;
+    public static int score;
+    public AudioSource explosion;
+    public Animator ani;
+    public Rigidbody2D rb;
+    public static bool window;
+    public static float currentTime;
+    float deadTimer;
+    bool dead;
+    public int currentDirection;
+    
+    // Start is called before the first frame update
+    void Start()
+    {
+        cushion = .3f;
+        score = 0;
+        currentDirection = 0; 
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+        transform.rotation = Quaternion.Euler(0, 0, 90 * currentDirection);
+        //A cushion of time is given for fairness purposes
+        if(score>=10&&score<20)
+        {
+            cushion = .2f;
+        }else if(score>20)
+        {
+            cushion = .1f;
+        }
+        currentTime += Time.deltaTime;
+        //Kills you if you take to long
+        if(currentTime>=cushion&&window)
+        {
+            window = false;
+            if(currentDirection!=MoonManager.currentDirection)
+            {
+                dead=true;
+            }
+        }
+        //press the correct direction otherwise itll kill you
+        if(window)
+        {
+            
+            if(Input.GetKey("up"))
+            {
+                if (MoonManager.nextDirection == 0)
+                {
+                    currentDirection = 0;
+                    
+                }
+                else
+                {
+                    currentDirection = 0;
+                    dead =true;
+                }
+                window = false;
+                
+            }
+            if (Input.GetKey("left"))
+            {
+                if (MoonManager.nextDirection == 1)
+                {
+                    currentDirection = 1;
+                    
+                }
+                else
+                {
+                    currentDirection = 1;
+                    dead =true;
+                }
+                window = false;
+                
+            }
+            if (Input.GetKey("down"))
+            {
+                if (MoonManager.nextDirection == 2)
+                {
+                    currentDirection = 2;
+                    
+                }
+                else
+                {
+                    currentDirection = 2;
+                    dead =true;
+                }
+                window = false;
+                
+            }
+            if (Input.GetKey("right"))
+            {
+                if (MoonManager.nextDirection == 3)
+                {
+                    currentDirection = 3;
+                    
+                }
+                else
+                {
+                    currentDirection = 3;
+                    dead =true;
+                }
+                window = false;
+                
+            }
+        }
+        //press it during the switch otherwise itll kill you
+        if(!window)
+        {
+            if(Input.GetKey("up"))
+            {
+                if (currentDirection != 0)
+                {
+                    currentDirection = 0;
+                    dead = true; 
+                }
+            }
+            if (Input.GetKey("left"))
+            {
+                if (currentDirection != 1)
+                {
+                    currentDirection = 1;
+                    dead = true;
+                }
+            }
+            if (Input.GetKey("down"))
+            {
+                if (currentDirection != 2)
+                {
+                    currentDirection = 2;
+                    dead = true;
+                }
+            }
+            if (Input.GetKey("right"))
+            {
+                if (currentDirection != 3)
+                {
+                    currentDirection = 3;
+                    dead = true;
+                }
+            }
+        }
+        //death animation
+        if(dead){
+            for(int i=0;i<5;i++)
+            {
+                transform.position += transform.up * Time.deltaTime*2;
+            }
+            
+            deadTimer += Time.deltaTime;
+            
+            
+        }
+        if(deadTimer>=.3f)
+        {
+            ani.SetBool("Dead", true);
+            explosion.Play();
+        }
+        if(deadTimer>=.5f)
+        {
+            Die();
+        }
+    }
+    void Die()
+    {
+        
+        SceneManager.LoadScene("GameOver");
+    }
+}
