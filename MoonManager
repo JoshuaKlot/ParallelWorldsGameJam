@@ -1,0 +1,150 @@
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class MoonManager : MonoBehaviour
+{
+    public AudioSource Go;
+    public GameObject AM;
+    public static int currentDirection;
+    public static int nextDirection;
+    int headTails;
+    public int timerToSwitch;
+    float currentTimer;
+    float rotateTimer;
+    bool switching;
+    bool rotating;
+    int degrees;
+    int baseR;
+    bool positive;
+    // Start is called before the first frame update
+    void Start()
+    {
+        currentDirection = 0;
+        timerToSwitch = Random.Range(3, 5);
+        rotating = false;
+        degrees = 0;
+        rotateTimer = 0;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if(!rotating)
+            transform.rotation = Quaternion.Euler(0, 0, 90 * currentDirection);
+        
+        currentTimer += Time.deltaTime;
+
+        //Calls to rotate at random intervals
+        //The timing is sticter when the score is higher
+        if (currentTimer >= timerToSwitch && !switching)
+        {
+            PlanetController.score++;
+            switching = true;
+            ArrowManager.blinking = false;
+            headTails = Random.Range(0, 2);
+            if (currentDirection % 2 == 0)
+            {
+                if (headTails == 0)
+                {
+                    nextDirection = 1;
+                }
+                else
+                {
+                    nextDirection = 3;
+                }
+            }
+            else
+            {
+                if (headTails == 0)
+                {
+                    nextDirection = 0;
+                }
+                else
+                {
+                    nextDirection = 2;
+                }
+            }
+            ArrowManager.blinking = true;
+            currentTimer = 0;
+            AM.GetComponent<ArrowManager>().On();
+
+            if ((nextDirection > currentDirection || (currentDirection == 3 && nextDirection == 0))&&!(currentDirection == 0 && nextDirection == 3))
+            {
+                positive = true;
+            }
+            else if (nextDirection < currentDirection || (currentDirection == 0 && nextDirection == 3))
+            {
+                positive = false;
+            }
+
+        }
+        //rotates the moons on queue
+        if(currentTimer>=ArrowManager.blinktimer-.1f&&switching)
+        {
+            Go.Play();
+            PlanetController.window = true;
+            PlanetController.currentTime = 0;
+            rotating = true;
+            baseR = currentDirection;
+        }
+        //Changing variables based on score
+        if (currentTimer >= ArrowManager.blinktimer && switching)
+        {
+            switching = false;
+            if (PlanetController.score < 5)
+            {
+                timerToSwitch = Random.Range(1, 5);
+                ArrowManager.blinktimer = 2f;
+            }
+            else if (PlanetController.score >= 5 && PlanetController.score < 10)
+            {
+                timerToSwitch = Random.Range(1, 5);
+                ArrowManager.blinktimer = 1.5f;
+            }
+            else if (PlanetController.score >= 10 && PlanetController.score < 15)
+            {
+                timerToSwitch = Random.Range(1, 4);
+                ArrowManager.blinktimer = 1f;
+            }
+            else if (PlanetController.score >= 15 && PlanetController.score < 20)
+            {
+                timerToSwitch = Random.Range(1, 4);
+                ArrowManager.blinktimer = .75f;
+            }
+            else
+            {
+                timerToSwitch = Random.Range(1, 3);
+                ArrowManager.blinktimer =.5f;
+            }
+
+            ArrowManager.blinking = false;
+            currentDirection = nextDirection;
+            currentTimer = 0;
+        }
+        //the rotation animation
+        if(rotating&&degrees<90)
+        {
+
+            
+            if(rotateTimer>=0.0001f)
+            {
+                if(positive)
+                     transform.rotation= Quaternion.Euler(0, 0, (baseR*90+degrees));
+                else
+                    transform.rotation = Quaternion.Euler(0, 0, (baseR * 90 - degrees));
+                degrees++;
+                rotateTimer = 0;
+            }
+            rotateTimer += Time.deltaTime;
+        }
+        if(degrees>=90)
+        {
+            Go.Stop();
+            degrees = 0;
+            rotating = false;
+        }
+    }
+    
+}
