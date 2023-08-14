@@ -1,0 +1,30 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class AudioSpeed : MonoBehaviour
+{
+    public AudioSource normal;
+    public AudioSource fast;
+    public AudioSource faster;
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        //The higher the score the faster the music goes
+        if(PlanetController.score>=10&&PlanetController.score<20)
+        {
+            normal.mute = true;
+            fast.mute = false;
+        }else if(PlanetController.score>=20)
+        {
+            fast.mute = true;
+            faster.mute = false;
+        }
+    }
+}
