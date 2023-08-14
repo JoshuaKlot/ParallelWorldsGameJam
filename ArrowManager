@@ -1,0 +1,69 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class ArrowManager : MonoBehaviour
+{
+    
+    public AudioSource Beep;
+    public static float blinktimer;
+    public static bool blinking;
+    public static bool finishBlink;
+    float currentTimer;
+    bool on;
+    // Start is called before the first frame update
+    void Start()
+    {
+        for(int i=0;i<this.gameObject.transform.childCount;i++)
+        {
+            this.transform.GetChild(i).gameObject.SetActive(false);
+        }
+        blinktimer = 3;
+        currentTimer = 0;
+        on = false;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        //An arrow will begin blinking and making noise after recieving the signal
+        if (blinking)
+        {
+            
+            if (currentTimer > blinktimer / 5)
+            {
+                
+                if (on)
+                { 
+                    this.transform.GetChild(MoonManager.nextDirection).gameObject.SetActive(false);
+                    on = false;
+                    Beep.Stop();
+
+                }
+                else
+                { 
+                    this.transform.GetChild(MoonManager.nextDirection).gameObject.SetActive(true);
+                    on = true;
+                    Beep.Play();
+                }
+                
+                currentTimer = 0;
+            }
+            currentTimer += Time.deltaTime;
+        }
+        else
+        {
+            this.transform.GetChild(MoonManager.nextDirection).gameObject.SetActive(false);
+            on = false;
+            Beep.Stop();
+        }
+        
+    }
+    public void On()
+    {
+        Beep.Play();
+        this.transform.GetChild(MoonManager.nextDirection).gameObject.SetActive(true);
+        on = true;
+        currentTimer = 0;
+    }
+}
